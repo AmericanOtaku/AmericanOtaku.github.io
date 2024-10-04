@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,6 +7,11 @@
   <title>KnowledgeQuest</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    
     .node circle {
       fill: #ff5722;
     }
@@ -20,11 +26,6 @@
     }
     #video-container {
       margin-top: 20px;
-    }
-    
-    body {
-      margin: 0;
-      padding: 0;
     }
     
     #banner {
@@ -54,38 +55,16 @@
 
   <div id="searchResults"></div>
 
-  <script src="script.js"></script>
-
   <div id="mindmap"></div>
   <div id="video-container">
     <iframe id="youtube-frame" width="560" height="315" frameborder="0" allowfullscreen></iframe>
   </div>
-  
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    .node circle {
-      fill: #ff5722;
-    }
-    .node text {
-      font-size: 14px;
-      fill: #333;
-    }
-    .link {
-      fill: none;
-      stroke: #999;
-      stroke-width: 2px;
-    }
-    #video-container {
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
 
+  <script>
     // Input data
     const data = {
       nodes: [
-        { id: '1', label: 'Java Programming for Beginners – Full Course', url: 'youtube.com/watch?v=A74TOX803D0' },
+        { id: '1', label: 'Java Programming for Beginners – Full Course', youtubeId: 'A74TOX803D0' },
         { id: '2', label: 'Topic 1', youtubeId: 'VIDEO_ID2' },
         { id: '3', label: 'Topic 2', youtubeId: 'VIDEO_ID3' },
         { id: '4', label: 'Conclusion', youtubeId: 'VIDEO_ID4' }
@@ -127,7 +106,7 @@
       .enter()
       .append('g')
       .attr('class', 'node')
-      .on('click', d => loadVideo("https://www.youtube.com/watch?v=A74TOX803D0"));
+      .on('click', (event, d) => loadVideo(d.youtubeId));
 
     node.append('circle')
       .attr('r', 20)
@@ -175,19 +154,10 @@
     function loadVideo(youtubeId) {
       console.log('Loading YouTube video with ID:', youtubeId);  // Debug
       const iframe = document.getElementById('youtube-frame');
-      //iframe.src = `https://www.youtube.com/embed/`;
-      iframe.src = youtubeId;
-    }
-
-
-
-    // Utility function to extract the video ID from a URL
-    function extractVideoId(url) {
-    const regex = /v=([a-zA-Z0-9_-]+)/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
+      iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
     }
 
   </script>
 </body>
+</html>
 

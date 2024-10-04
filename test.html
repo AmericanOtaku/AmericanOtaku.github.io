@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Mind Map</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .node circle {
+      fill: #ff5722;
+    }
+    .node text {
+      font-size: 14px;
+      fill: #333;
+    }
+    .link {
+      fill: none;
+      stroke: #999;
+      stroke-width: 2px;
+    }
+    #video-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="mindmap"></div>
+  <div id="video-container">
+
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <iframe 
+        width="560" 
+        height="315" 
+        src="https://www.youtube.com/embed/A74TOX803D0?si=oMkmF-BoCSZPYVBa" 
+        title="YouTube video player" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen>
+    </iframe>
+
+    <script>
+
+        // Input data
+    const data = {
+      nodes: [
+        { id: '1', label: 'Java Programming for Beginners – Full Course', url: 'youtube.com/watch?v=A74TOX803D0' },
+        { id: '2', label: 'Topic 1', youtubeId: 'VIDEO_ID2' },
+        { id: '3', label: 'Topic 2', youtubeId: 'VIDEO_ID3' },
+        { id: '4', label: 'Conclusion', youtubeId: 'VIDEO_ID4' }
+      ],
+      edges: [
+        { source: '1', target: '2' },
+        { source: '1', target: '3' },
+        { source: '3', target: '4' }
+      ]
+    };
+
+    // Create SVG canvas
+    const width = 800;
+    const height = 600;
+
+    const svg = d3.select('#mindmap')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height);
+
+    // Initialize force simulation
+    const simulation = d3.forceSimulation(data.nodes)
+      .force('link', d3.forceLink(data.edges).id(d => d.id).distance(100))
+      .force('charge', d3.forceManyBody().strength(-300))
+      .force('center', d3.forceCenter(width / 2, height / 2));
+
+    // Draw links (edges)
+    const link = svg.append('g')
+      .selectAll('line')
+      .data(data.edges)
+      .enter()
+      .append('line')
+      .attr('class', 'link');
+
+    // Draw nodes
+    const node = svg.append('g')
+      .selectAll('g')
+      .data(data.nodes)
+      .enter()
+      .append('g')
+      .attr('class', 'node')
+      .on('click', d => loadVideo("https://www.youtube.com/watch?v=A74TOX803D0"));
+
+    node.append('circle')
+      .attr('r', 20)
+      .call(d3.drag()
+        .on('start', dragStarted)
+        .on('drag', dragged)
+        .on('end', dragEnded));
+
+    node.append('text')
+      .attr('x', 25)
+      .attr('y', 5)
+      .text(d => d.label);
+
+    // Update positions on each simulation tick
+    simulation.on('tick', () => {
+      link
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+
+      node
+        .attr('transform', d => `translate(${d.x}, ${d.y})`);
+    });
+
+    // Drag functions
+    function dragStarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+
+    function dragEnded(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+    
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: 'M7lc1UVf-VE',
+          playerVars: {
+            'playsinline': 1
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+          setTimeout(stopVideo, 6000);
+          done = true;
+        }
+      }
+      function stopVideo() {
+        player.stopVideo();
+      }
+    </script>
+  </body>
+</html>
